@@ -1,8 +1,7 @@
 package br.com.hacka.imageExtractor.api
 
 import br.com.hacka.imageExtractor.controller.StorageController
-import br.com.hacka.imageExtractor.core.entity.Storage
-import br.com.hacka.imageExtractor.gateway.DynamoDbGateway
+import br.com.hacka.imageExtractor.gateway.StorageGateway
 import br.com.hacka.imageExtractor.gateway.SqsGateway
 import br.com.hacka.imageExtractor.interfaces.IStorageGateway
 import org.springframework.validation.annotation.Validated
@@ -15,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile
 class StorageApi (
   private val storageGateway: IStorageGateway,
   private val storageController: StorageController,
-  private val dynamoDbGateway: DynamoDbGateway,
+  private val dynamoDbGateway: StorageGateway,
   private val sqsGateway: SqsGateway
 ) {
 

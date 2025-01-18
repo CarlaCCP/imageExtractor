@@ -7,10 +7,9 @@ import software.amazon.awssdk.services.dynamodb.model.AttributeValue
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest
-import java.util.UUID
 
 @Repository
-class DynamoDbGateway (
+class StorageGateway (
 
   private val dynamoDbClient: DynamoDbClient
 ) {
