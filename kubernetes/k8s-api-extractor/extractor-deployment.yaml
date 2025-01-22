@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: extractordeployment
+  labels:
+    app: extractordeployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: extractordeployment
+  template:
+    metadata:
+      labels:
+        app: extractordeployment
+    spec:
+      containers:
+        - name: extractor
+          image: carlaccp/extractor
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 1m
