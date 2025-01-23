@@ -1,5 +1,6 @@
 package br.com.hacka.imageExtractor.gateway
 
+import br.com.hacka.imageExtractor.core.dto.UploadRequest
 import br.com.hacka.imageExtractor.interfaces.IStorageGateway
 import org.springframework.stereotype.Repository
 import org.springframework.web.multipart.MultipartFile
@@ -8,11 +9,13 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import software.amazon.awssdk.services.s3.presigner.S3Presigner
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest
+import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest
 import software.amazon.awssdk.services.sqs.SqsClient
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 import java.time.Duration
+import java.util.UUID
 
 @Repository
 class S3Gateway (
@@ -49,6 +52,21 @@ class S3Gateway (
       .build()
 
     return s3Presigner.presignGetObject(getObjectPresignObjectRequest).url().toString()
+  }
+
+  override fun getUploadPresignUrl(fileName: String): String {
+    val putObjectRequest = PutObjectRequest.builder()
+      .bucket(bucketName)
+      .key(fileName)
+      .build()
+
+    val url = PutObjectPresignRequest.builder()
+      .signatureDuration(Duration.ofMinutes(10))
+      .putObjectRequest(putObjectRequest)
+      .build()
+
+    return s3Presigner.presignPutObject(url).url().toString()
+
   }
 
 }
