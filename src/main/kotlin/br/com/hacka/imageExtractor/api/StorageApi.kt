@@ -1,6 +1,7 @@
 package br.com.hacka.imageExtractor.api
 
 import br.com.hacka.imageExtractor.controller.StorageController
+import br.com.hacka.imageExtractor.core.dto.UploadRequest
 import br.com.hacka.imageExtractor.gateway.StorageGateway
 import br.com.hacka.imageExtractor.gateway.SqsGateway
 import br.com.hacka.imageExtractor.interfaces.IStorageGateway
@@ -23,7 +24,12 @@ class StorageApi (
     @RequestPart("file") videoFile: MultipartFile
   ) = storageController.upload(storageGateway, sqsGateway, dynamoDbGateway, videoFile)
 
+  @PostMapping
+  fun extractor(@RequestBody uploadRequest: UploadRequest) = storageController.extractor(sqsGateway, dynamoDbGateway, uploadRequest.id.toString())
   @GetMapping("/download/{id}")
   fun download(@PathVariable id: String) = storageController.download(dynamoDbGateway, id)
+
+  @GetMapping("upload/{filename}")
+  fun uploadUrl(@PathVariable filename: String) = storageController.getUploadUrl(storageGateway, dynamoDbGateway, filename)
 
 }

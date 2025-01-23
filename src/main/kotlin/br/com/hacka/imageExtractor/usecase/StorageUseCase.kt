@@ -1,5 +1,6 @@
 package br.com.hacka.imageExtractor.usecase
 
+import br.com.hacka.imageExtractor.core.dto.UploadRequest
 import br.com.hacka.imageExtractor.core.entity.Storage
 import br.com.hacka.imageExtractor.gateway.StorageGateway
 import br.com.hacka.imageExtractor.gateway.S3Gateway
@@ -46,6 +47,18 @@ class StorageUseCase {
     return storage
   }
 
+
+  fun upload (
+    sqsGateway: SqsGateway,
+    dynamoDbGateway: StorageGateway,
+    id: String ) : Storage
+  {
+   val storage = dynamoDbGateway.getItem(id)
+    sqsGateway.sendMessage(storage)
+    log.info { "Arquivo enviado para extração" }
+    return storage
+  }
+
   fun download (storageGateway: StorageGateway, id: String) : Storage {
     return storageGateway.getItem(id)
   }
@@ -74,6 +87,21 @@ class StorageUseCase {
       }
     }
   }
+
+  fun uploadUrl (storageGateway: IStorageGateway, dynamoDbGateway: StorageGateway, filename: String): UploadRequest {
+    val path = UUID.randomUUID().toString()
+    val file = "$path/$filename"
+    val url = storageGateway.getUploadPresignUrl(file)
+
+
+    dynamoDbGateway.save(
+      Storage(
+      id = path, uploadFilename = filename, downloadStatus = "processando", ttl = Instant.now().plus(3).millis
+    ))
+
+    return UploadRequest(fileName = file, url = url, id = path)
+  }
+
 
   private fun convertToObject(message: String): Storage {
     return jacksonObjectMapper().readValue<Storage>(message)
