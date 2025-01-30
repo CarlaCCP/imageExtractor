@@ -54,14 +54,6 @@ jobs:
         - name: Update kube config
           run: aws eks update-kubeconfig --name tech
 
-#        - name: Deploy to EKS mongo
-#          run: |
-#            kubectl apply -f kubernetes/k8s-db-loja
-
-        # - name: Deploy to EKS config-map
-        #   run: |
-        #     kubectl apply -f kubernetes/k8s-api-loja/k8s-configmap       
-
         - name: Deploy to EKS api
           run: |
             kubectl apply -f kubernetes/k8s-api-extractor
