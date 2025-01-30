@@ -21,6 +21,7 @@ class ClientGateway(
           "cpf" to AttributeValue.builder().s(client.cpf).build(),
           "nome" to AttributeValue.builder().s(client.nome).build(),
           "email" to AttributeValue.builder().s(client.email).build(),
+          "senha" to AttributeValue.builder().s(client.senha).build()
         )
       )
       .build()

@@ -2,6 +2,7 @@ package br.com.hacka.imageExtractor.usecase
 
 import br.com.hacka.imageExtractor.core.dto.UploadRequest
 import br.com.hacka.imageExtractor.core.entity.Storage
+import br.com.hacka.imageExtractor.core.event.UpdateEvent
 import br.com.hacka.imageExtractor.gateway.StorageGateway
 import br.com.hacka.imageExtractor.gateway.S3Gateway
 import br.com.hacka.imageExtractor.gateway.SqsGateway
@@ -51,9 +52,10 @@ class StorageUseCase {
   fun upload (
     sqsGateway: SqsGateway,
     dynamoDbGateway: StorageGateway,
-    id: String ) : Storage
+   updateRequest: UploadRequest ) : Storage
   {
-   val storage = dynamoDbGateway.getItem(id)
+   val storage = dynamoDbGateway.getItem(updateRequest.id!!)
+    dynamoDbGateway.updateUserEmail(storage.copy(userEmail = updateRequest.userEmail))
     sqsGateway.sendMessage(storage)
     log.info { "Arquivo enviado para extração" }
     return storage
@@ -64,25 +66,43 @@ class StorageUseCase {
   }
 
 
+  fun getDownloads (storageGateway: StorageGateway, user: String) : List<Storage> {
+    return storageGateway.getItemByUser(user)
+  }
+
   fun getPresignDownloadUrl(
     sqsGateway: SqsGateway,
     storageGateway: StorageGateway,
     s3Gateway: S3Gateway
   ) {
     val message = sqsGateway.getMessage()
-    if (message.isNullOrEmpty()) {
-      log.info { "Fila vazia" }
-    } else {
+    if (!message.isNullOrEmpty()) {
+
       log.info { "Processo de download iniciado" }
+
       message.map {
-        val storage = convertToObject(it.body())
-        val downloadUrl = s3Gateway.getPresignUrl(storage.downloadFilename.toString())
-        storageGateway.update(
-          storage.copy(
-            downloadUrl = downloadUrl,
-            downloadStatus = "download completo"
+        val updateEvent = convertToObject(it.body())
+        val storage = storageGateway.getItem(updateEvent.id.toString())
+
+        if(updateEvent.error != null) {
+          storageGateway.update(
+            storage.copy(
+              downloadFilename = updateEvent.downloadFilename,
+              downloadUrl = "null",
+              downloadStatus = "Erro no download",
+            )
           )
-        )
+        }
+        else {
+          storageGateway.update(
+            storage.copy(
+              downloadFilename = updateEvent.downloadFilename,
+              downloadUrl = s3Gateway.getPresignUrl(updateEvent.downloadFilename.toString()),
+              downloadStatus = "download completo"
+            )
+          )
+        }
+
         sqsGateway.deleteMessage(it)
       }
     }
@@ -103,8 +123,8 @@ class StorageUseCase {
   }
 
 
-  private fun convertToObject(message: String): Storage {
-    return jacksonObjectMapper().readValue<Storage>(message)
+  private fun convertToObject(message: String): UpdateEvent {
+    return jacksonObjectMapper().readValue<UpdateEvent>(message)
   }
 
 }

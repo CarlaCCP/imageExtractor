@@ -32,8 +32,8 @@ class StorageController (
   fun extractor (
     sqsGateway: SqsGateway,
     dynamoDbGateway: StorageGateway,
-    id: String
-  ) = storageConfig.storageUseCase().upload(sqsGateway, dynamoDbGateway, id)
+   updateRequest: UploadRequest
+  ) = storageConfig.storageUseCase().upload(sqsGateway, dynamoDbGateway, updateRequest)
 
   fun getPresignDownloadUrl(
     sqsGateway: SqsGateway,
@@ -45,5 +45,9 @@ class StorageController (
 
   fun getUploadUrl(storageGateway: IStorageGateway, dynamoDbGateway: StorageGateway, filename: String) : UploadRequest{
     return storageConfig.storageUseCase().uploadUrl(storageGateway, dynamoDbGateway, filename)
+  }
+
+  fun getDownloads (storageGateway: StorageGateway, user: String) : List<Storage> {
+    return storageConfig.storageUseCase().getDownloads(storageGateway, user)
   }
 }

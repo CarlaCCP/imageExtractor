@@ -5,6 +5,7 @@ import br.com.hacka.imageExtractor.core.dto.UploadRequest
 import br.com.hacka.imageExtractor.gateway.StorageGateway
 import br.com.hacka.imageExtractor.gateway.SqsGateway
 import br.com.hacka.imageExtractor.interfaces.IStorageGateway
+import jakarta.validation.Valid
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -25,11 +26,14 @@ class StorageApi (
   ) = storageController.upload(storageGateway, sqsGateway, dynamoDbGateway, videoFile)
 
   @PostMapping
-  fun extractor(@RequestBody uploadRequest: UploadRequest) = storageController.extractor(sqsGateway, dynamoDbGateway, uploadRequest.id.toString())
+  fun extractor(@RequestBody uploadRequest: UploadRequest) =
+    storageController.extractor(sqsGateway, dynamoDbGateway, uploadRequest)
   @GetMapping("/download/{id}")
   fun download(@PathVariable id: String) = storageController.download(dynamoDbGateway, id)
 
   @GetMapping("upload/{filename}")
   fun uploadUrl(@PathVariable filename: String) = storageController.getUploadUrl(storageGateway, dynamoDbGateway, filename)
 
+  @GetMapping
+  fun getDownloads (@Valid user: String) = storageController.getDownloads(dynamoDbGateway, user)
 }
