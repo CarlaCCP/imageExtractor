@@ -2,7 +2,8 @@ name: ci + cd
 
 on:
   push:
-    branches: main
+    branches:
+      - main
 
 jobs:
      login:
