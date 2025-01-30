@@ -17,8 +17,8 @@ class SqsGateway (
 
   private val log = KotlinLogging.logger {}
 
-  private val createQueue = "https://sqs.us-east-1.amazonaws.com/339712924021/create-frames-queue"
-  private val updateQueue = "https://sqs.us-east-1.amazonaws.com/339712924021/update-frames-queue"
+  private val createQueue = "https://sqs.us-east-1.amazonaws.com/118934669452/create-frames-queue"
+  private val updateQueue = "https://sqs.us-east-1.amazonaws.com/118934669452/update-frames-queue"
 
   fun sendMessage(storage: Storage) {
     val sendMessage = SendMessageRequest.builder()

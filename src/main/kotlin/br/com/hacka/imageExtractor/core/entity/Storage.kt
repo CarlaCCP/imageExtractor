@@ -9,4 +9,5 @@ data class Storage (
   val downloadStatus: String? = null,
   val downloadUrl: String? = null,
   val ttl: Long? = null,
+  val userEmail: String? = null,
 )
