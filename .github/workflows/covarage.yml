@@ -28,7 +28,7 @@
            ./mvnw clean verify
 
        - name: Upload Report
-         uses: 'actions/upload-artifact@v3'
+         uses: 'actions/upload-artifact@v4'
          with:
            name: jacoco.xml
            path: ${{ github.workspace }}/target/site/jacoco/jacoco.xml
