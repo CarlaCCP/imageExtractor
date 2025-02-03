@@ -19,35 +19,6 @@ import java.util.UUID
 class StorageUseCase {
   private val log = KotlinLogging.logger {}
 
-  fun uploadFile(
-    storageGateway: IStorageGateway,
-    sqsGateway: SqsGateway,
-    dynamoDbGateway: StorageGateway,
-    file: MultipartFile
-  ): Storage {
-
-    val id = UUID.randomUUID().toString()
-
-    val tempFile = Files.createTempFile(file.originalFilename, null)
-    file.inputStream.use { inputStream ->
-      Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING)
-    }
-
-    val filename = storageGateway.upload(file, tempFile, id)
-
-    Files.delete(tempFile)
-
-    val storage = Storage(
-      id = id,
-      uploadFilename = filename,
-      downloadStatus = "processando",
-      ttl = Instant.now().plus(3).millis
-    )
-    sqsGateway.sendMessage(storage)
-    dynamoDbGateway.save(storage)
-    return storage
-  }
-
 
   fun upload (
     sqsGateway: SqsGateway,

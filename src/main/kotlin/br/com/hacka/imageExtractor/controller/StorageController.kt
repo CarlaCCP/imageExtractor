@@ -8,22 +8,12 @@ import br.com.hacka.imageExtractor.gateway.S3Gateway
 import br.com.hacka.imageExtractor.gateway.SqsGateway
 import br.com.hacka.imageExtractor.interfaces.IStorageGateway
 import org.springframework.stereotype.Component
-import org.springframework.web.multipart.MultipartFile
 
 @Component
 class StorageController (
 
   private val storageConfig: StorageConfig
 ) {
-
-  fun upload (
-    storageGateway: IStorageGateway,
-    sqsGateway: SqsGateway,
-    dynamoDbGateway: StorageGateway,
-    file: MultipartFile
-  ) : Storage {
-    return storageConfig.storageUseCase().uploadFile(storageGateway, sqsGateway, dynamoDbGateway, file)
-  }
 
   fun download(storageGateway: StorageGateway, id: String) : Storage {
     return storageConfig.storageUseCase().download(storageGateway, id)
