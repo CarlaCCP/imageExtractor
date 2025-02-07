@@ -8,7 +8,6 @@ import br.com.hacka.imageExtractor.interfaces.IStorageGateway
 import jakarta.validation.Valid
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("/extract")
@@ -19,11 +18,6 @@ class StorageApi (
   private val dynamoDbGateway: StorageGateway,
   private val sqsGateway: SqsGateway
 ) {
-
-  @PostMapping("/storage")
-  fun storage(
-    @RequestPart("file") videoFile: MultipartFile
-  ) = storageController.upload(storageGateway, sqsGateway, dynamoDbGateway, videoFile)
 
   @PostMapping
   fun extractor(@RequestBody uploadRequest: UploadRequest) =
